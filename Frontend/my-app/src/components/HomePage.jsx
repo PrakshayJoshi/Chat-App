@@ -6,7 +6,8 @@ const HomePage = () => {
     const [messages, setMessages] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
+  
+    
     useEffect(() => {
         fetchMessages();
     }, []);
@@ -26,39 +27,47 @@ const HomePage = () => {
             setLoading(false);
         }
     };
+     
+    // Inside HomePage component
 
-    const sendMessage = async () => {
-        if (message.trim() !== '') {
-            try {
-                // Request user's location
-                navigator.geolocation.getCurrentPosition(async (position) => {
-                    const { latitude, longitude } = position.coords;
-                    const location = { latitude, longitude };
+const sendMessage = async () => {
+    if (message.trim() !== '') {
+        try {
+            // Request user's location
+            navigator.geolocation.getCurrentPosition(async (position) => {
+                const { latitude, longitude } = position.coords;
+                
+                // Format location data
+                const location = {
+                    type: 'Point',
+                    coordinates: [longitude, latitude] // Note the order: [longitude, latitude]
+                };
 
-                    // Send message along with location to backend
-                    const response = await fetch('http://localhost:9000/api/messages/send', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ text: message, location })
-                    });
-                    const data = await response.json();
-                    console.log('Success:', data);
-                    if (data.success) {
-                        // Update messages state with new message
-                        setMessages([...messages, data.message]);
-                    }
-                    setMessage('');
-                }, (error) => {
-                    console.error('Error getting location:', error);
+                // Send message along with location to backend
+                const response = await fetch('http://localhost:9000/api/messages/send', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ text: message, location })
                 });
-            } catch (error) {
-                console.error('Error sending message:', error);
-            }
+                const data = await response.json();
+                console.log('Success:', data);
+                if (data.success) {
+                    // Update messages state with new message at the beginning of the array
+                    setMessages([data.message, ...messages]);
+                }
+                setMessage('');
+            }, (error) => {
+                console.error('Error getting location:', error);
+            });
+        } catch (error) {
+            console.error('Error sending message:', error);
         }
-    };
+    }
+};
 
+    
     const handleKeyDown = (event) => {
         if (event.key === 'Enter') {
             sendMessage();
@@ -78,28 +87,24 @@ const HomePage = () => {
                 />
                 <button onClick={sendMessage}>Send</button>
             </div>
-            
-            // Inside HomePage component
-<div>
-    {loading ? (
-        <p>Loading...</p>
-    ) : error ? (
-        <p>Error: {error}</p>
-    ) : (
-        messages.map((msg, index) => (
-            <div key={index}>
-                <p>{msg.text}</p>
-                {msg.location && msg.location.latitude && msg.location.longitude ? (
-                    <p>Location: {msg.location.latitude}, {msg.location.longitude}</p>
+            <div>
+                {loading ? (
+                    <p>Loading...</p>
+                ) : error ? (
+                    <p>Error: {error}</p>
                 ) : (
-                    <p>Location not available</p>
+                    messages.map((msg, index) => (
+                        <div key={index}>
+                            <p>{msg.text}</p>
+                            {msg.location ? (
+                                <p>Location: {msg.location.latitude}, {msg.location.longitude}</p>
+                            ) : (
+                                <p>Location not available</p>
+                            )}
+                        </div>
+                    ))
                 )}
             </div>
-        ))
-    )}
-</div>
-
-
         </div>
     );
 };

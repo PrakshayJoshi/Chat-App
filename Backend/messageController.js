@@ -5,7 +5,7 @@ const Message = require('./Message');
 
 exports.sendMessage = async (req, res) => {
     const { text, location } = req.body;
-    
+
     try {
         console.log('Received message:', text);
         console.log('Received location:', location);
@@ -13,7 +13,7 @@ exports.sendMessage = async (req, res) => {
         const message = new Message({ text, location });
         await message.save();
         console.log('Message saved:', message);
-      
+
         res.status(201).json({ success: true, message });
     } catch (error) {
         console.error('Error sending message:', error.message);
