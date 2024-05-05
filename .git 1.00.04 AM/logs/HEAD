@@ -1,0 +1,10 @@
+0000000000000000000000000000000000000000 f1e2ffd8ffa9ae60a660bc04ecb49a38ce38e209 Prakshay Joshi <prakshayjoshi@Prakshays-MacBook-Air.local> 1714824699 +0530	commit (initial): first commit
+f1e2ffd8ffa9ae60a660bc04ecb49a38ce38e209 0000000000000000000000000000000000000000 Prakshay Joshi <prakshayjoshi@Prakshays-MacBook-Air.local> 1714824753 +0530	Branch: renamed refs/heads/main to refs/heads/main
+f1e2ffd8ffa9ae60a660bc04ecb49a38ce38e209 f1e2ffd8ffa9ae60a660bc04ecb49a38ce38e209 Prakshay Joshi <prakshayjoshi@Prakshays-MacBook-Air.local> 1714824753 +0530	Branch: renamed refs/heads/main to refs/heads/main
+f1e2ffd8ffa9ae60a660bc04ecb49a38ce38e209 f2cd50c954d14b5a3d4ca6d270157f2427fe9062 Prakshay Joshi <prakshayjoshi@Prakshays-MacBook-Air.local> 1714825239 +0530	commit: Second commit
+f2cd50c954d14b5a3d4ca6d270157f2427fe9062 c696c5b367961edba314d3e6fd7fead80c394a8f Prakshay Joshi <prakshayjoshi@Prakshays-MacBook-Air.local> 1714825288 +0530	commit (amend): Second commit
+c696c5b367961edba314d3e6fd7fead80c394a8f c696c5b367961edba314d3e6fd7fead80c394a8f Prakshay Joshi <prakshayjoshi@Prakshays-MacBook-Air.local> 1714844003 +0530	reset: moving to HEAD
+c696c5b367961edba314d3e6fd7fead80c394a8f c696c5b367961edba314d3e6fd7fead80c394a8f Prakshay Joshi <prakshayjoshi@Prakshays-MacBook-Air.local> 1714844162 +0530	checkout: moving from main to main
+c696c5b367961edba314d3e6fd7fead80c394a8f 2196ecc7b65f256195434d408bd45ddad591e2c0 Your Name <you@example.com> 1714849770 +0530	commit: First Commit
+2196ecc7b65f256195434d408bd45ddad591e2c0 0000000000000000000000000000000000000000 Your Name <you@example.com> 1714849876 +0530	Branch: renamed refs/heads/main to refs/heads/main
+2196ecc7b65f256195434d408bd45ddad591e2c0 2196ecc7b65f256195434d408bd45ddad591e2c0 Your Name <you@example.com> 1714849876 +0530	Branch: renamed refs/heads/main to refs/heads/main
