@@ -7,7 +7,6 @@ const app = express();
 
 // Connect to MongoDB
 connectDB();
-
 // Middleware
 app.use(express.json());
 app.use(cors());

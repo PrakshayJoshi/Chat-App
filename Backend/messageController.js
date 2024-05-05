@@ -1,12 +1,16 @@
 const Message = require('./Message');
 
+
+// In messageController.js
+
 exports.sendMessage = async (req, res) => {
-    const { text } = req.body;
+    const { text, location } = req.body;
     
     try {
         console.log('Received message:', text);
-      
-        const message = new Message({ text });
+        console.log('Received location:', location);
+
+        const message = new Message({ text, location });
         await message.save();
         console.log('Message saved:', message);
       
@@ -16,6 +20,7 @@ exports.sendMessage = async (req, res) => {
         res.status(500).json({ success: false, error: 'Server error' });
     }
 };
+
 
 exports.getMessages = async (req, res) => {
     try {

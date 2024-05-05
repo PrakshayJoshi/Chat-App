@@ -5,7 +5,7 @@ const HomePage = () => {
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null); // Add error state
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         fetchMessages();
@@ -22,32 +22,40 @@ const HomePage = () => {
             setLoading(false);
         } catch (error) {
             console.error('Failed to fetch messages:', error);
-            setError(error.message); // Set error state
+            setError(error.message);
             setLoading(false);
         }
     };
 
-    const sendMessage = () => {
+    const sendMessage = async () => {
         if (message.trim() !== '') {
-            fetch('http://localhost:9000/api/messages/send', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ text: message })
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Success:', data);
-                if (data.success) {
-                    // This should add the actual message object returned from the server
-                    setMessages([...messages, data.message]);
-                }
-                setMessage('');
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
+            try {
+                // Request user's location
+                navigator.geolocation.getCurrentPosition(async (position) => {
+                    const { latitude, longitude } = position.coords;
+                    const location = { latitude, longitude };
+
+                    // Send message along with location to backend
+                    const response = await fetch('http://localhost:9000/api/messages/send', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ text: message, location })
+                    });
+                    const data = await response.json();
+                    console.log('Success:', data);
+                    if (data.success) {
+                        // Update messages state with new message
+                        setMessages([...messages, data.message]);
+                    }
+                    setMessage('');
+                }, (error) => {
+                    console.error('Error getting location:', error);
+                });
+            } catch (error) {
+                console.error('Error sending message:', error);
+            }
         }
     };
 
@@ -57,7 +65,6 @@ const HomePage = () => {
         }
     };
 
-    
     return (
         <div>
             <h2>Home Page</h2>
@@ -71,19 +78,28 @@ const HomePage = () => {
                 />
                 <button onClick={sendMessage}>Send</button>
             </div>
-            <div>
-                {loading ? (
-                    <p>Loading...</p>
-                ) : error ? (
-                    <p>Error: {error}</p> // Display error message if there's an error
+            
+            // Inside HomePage component
+<div>
+    {loading ? (
+        <p>Loading...</p>
+    ) : error ? (
+        <p>Error: {error}</p>
+    ) : (
+        messages.map((msg, index) => (
+            <div key={index}>
+                <p>{msg.text}</p>
+                {msg.location && msg.location.latitude && msg.location.longitude ? (
+                    <p>Location: {msg.location.latitude}, {msg.location.longitude}</p>
                 ) : (
-                    messages.map((msg, index) => (
-                        <div key={index}>
-                            <p>{msg.text}</p>
-                        </div>
-                    ))
+                    <p>Location not available</p>
                 )}
             </div>
+        ))
+    )}
+</div>
+
+
         </div>
     );
 };
