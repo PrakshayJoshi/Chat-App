@@ -6,11 +6,17 @@ const HomePage = () => {
     const [messages, setMessages] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-  
-    
+
     useEffect(() => {
         fetchMessages();
     }, []);
+
+    useEffect(() => {
+        // Log location data for each message
+        messages.forEach((msg, index) => {
+            console.log(`Message ${index} Location:`, msg.location);
+        });
+    }, [messages]); // Run this effect whenever messages change
 
     const fetchMessages = async () => {
         try {
@@ -27,52 +33,67 @@ const HomePage = () => {
             setLoading(false);
         }
     };
-     
-    // Inside HomePage component
 
-const sendMessage = async () => {
-    if (message.trim() !== '') {
-        try {
-            // Request user's location
-            navigator.geolocation.getCurrentPosition(async (position) => {
-                const { latitude, longitude } = position.coords;
+    const handleKeyDown = async (event) => {
+        if (event.key === 'Enter') {
+            await sendMessage();
+        }
+    };
+
+    const getCurrentLocation = async () => {
+        return new Promise((resolve, reject) => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        resolve({
+                            type: 'Point',
+                            coordinates: [position.coords.latitude, position.coords.longitude]
+                        });
+                    },
+                    (error) => {
+                        reject(error);
+                    }
+                );
+            } else {
+                reject(new Error('Geolocation is not supported by this browser.'));
+            }
+        });
+    };
+    
+
+    const sendMessage = async () => {
+        if (message.trim() !== '') {
+            try {
+                // Get the user's current location
+                const location = await getCurrentLocation();
                 
-                // Format location data
-                const location = {
-                    type: 'Point',
-                    coordinates: [longitude, latitude] // Note the order: [longitude, latitude]
+                // Construct the message object with text and location
+                const messageObject = {
+                    text: message,
+                    location: location
                 };
-
-                // Send message along with location to backend
+    
+                // Send the message to the backend
                 const response = await fetch('http://localhost:9000/api/messages/send', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ text: message, location })
+                    body: JSON.stringify(messageObject)
                 });
+    
                 const data = await response.json();
                 console.log('Success:', data);
                 if (data.success) {
-                    // Update messages state with new message at the beginning of the array
                     setMessages([data.message, ...messages]);
                 }
                 setMessage('');
-            }, (error) => {
-                console.error('Error getting location:', error);
-            });
-        } catch (error) {
-            console.error('Error sending message:', error);
-        }
-    }
-};
-
-    
-    const handleKeyDown = (event) => {
-        if (event.key === 'Enter') {
-            sendMessage();
+            } catch (error) {
+                console.error('Error sending message:', error);
+            }
         }
     };
+    
 
     return (
         <div>
@@ -87,6 +108,8 @@ const sendMessage = async () => {
                 />
                 <button onClick={sendMessage}>Send</button>
             </div>
+
+            
             <div>
                 {loading ? (
                     <p>Loading...</p>
@@ -95,18 +118,17 @@ const sendMessage = async () => {
                 ) : (
                     messages.map((msg, index) => (
                         <div key={index}>
-                            <p>{msg.text}</p>
-                            {msg.location ? (
-                                <p>Location: {msg.location.latitude}, {msg.location.longitude}</p>
-                            ) : (
-                                <p>Location not available</p>
-                            )}
-                        </div>
+        <p>{msg.text}</p>
+        {/* Rendering location */}
+        {msg.location && msg.location.coordinates && (
+            <p>Location: {msg.location.coordinates[0]}, {msg.location.coordinates[1]}</p>
+        )}
+    </div>
                     ))
                 )}
             </div>
         </div>
-    );
+    );  
 };
 
 export default HomePage;
