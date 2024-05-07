@@ -2,8 +2,8 @@
 
 const express = require('express');
 const cors = require('cors');
-const connectDB = require('./db');
-const messageRoutes = require('./messageRoutes');
+const connectDB = require('./config/db');
+const messageRoutes = require('./routes/messageRoutes');
 
 const app = express();
 
