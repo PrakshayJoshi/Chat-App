@@ -12,11 +12,10 @@ const HomePage = () => {
     }, []);
 
     useEffect(() => {
-        // Log location data for each message
         messages.forEach((msg, index) => {
             console.log(`Message ${index} Location:`, msg.location);
         });
-    }, [messages]); // Run this effect whenever messages change
+    }, [messages]); 
 
     const fetchMessages = async () => {
         try {
@@ -60,20 +59,16 @@ const HomePage = () => {
         });
     };
     
-
     const sendMessage = async () => {
         if (message.trim() !== '') {
             try {
-                // Get the user's current location
                 const location = await getCurrentLocation();
                 
-                // Construct the message object with text and location
                 const messageObject = {
                     text: message,
                     location: location
                 };
     
-                // Send the message to the backend
                 const response = await fetch('http://localhost:9000/api/messages/send', {
                     method: 'POST',
                     headers: {
@@ -93,12 +88,11 @@ const HomePage = () => {
             }
         }
     };
-    
 
     return (
-        <div>
-            <h2>Home Page</h2>
-            <div>
+        <div className="container">
+            <h2 className="home-header">Home Page</h2>
+            <div className="message-input-container">
                 <input
                     type="text"
                     value={message}
@@ -108,22 +102,22 @@ const HomePage = () => {
                 />
                 <button onClick={sendMessage}>Send</button>
             </div>
-
             
-            <div>
+            <div className="messages-container">
                 {loading ? (
-                    <p>Loading...</p>
+                    <p className="loading">Loading...</p>
                 ) : error ? (
-                    <p>Error: {error}</p>
+                    <p className="error">Error: {error}</p>
                 ) : (
                     messages.map((msg, index) => (
-                        <div key={index}>
-        <p>{msg.text}</p>
-        {/* Rendering location */}
-        {msg.location && msg.location.coordinates && (
-            <p>Location: {msg.location.coordinates[0]}, {msg.location.coordinates[1]}</p>
-        )}
-    </div>
+                        <div key={index} className="message">
+                            <p>{msg.text}</p>
+                            {msg.location && msg.location.coordinates && (
+                                <p className="message-location">
+                                    Location: {msg.location.coordinates[0]}, {msg.location.coordinates[1]}
+                                </p>
+                            )}
+                        </div>
                     ))
                 )}
             </div>

@@ -1,30 +1,67 @@
-/* src/styles/login.css */
-.login-container {
+body, html {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+  }
+  
+  .login-container {
+    width: 100%;
+    max-width: 450px; /* Moderate max-width */
+    padding: 2rem; /* Moderate padding */
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    background-color: #f2f2f2;
-}
-
-.login-header {
-    margin-bottom: 20px;
-    font-size: 24px;
-    color: #333;
-}
-
-.login-button {
-    padding: 10px 20px;
-    font-size: 16px;
-    color: white;
-    background-color: #007bff;
+    align-items: center; /* Center items horizontally */
+  }
+  
+  .login-header {
+    text-align: center;
+    margin-bottom: 1rem;
+    font-size: 1.3rem; /* Moderate font size */
+  }
+  
+  .form {
+    width: 100%; /* Make the form take full width of the container */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center items horizontally */
+  }
+  
+  .input-field {
+    width: 100%; /* Make input fields take full width of the form */
+    margin-bottom: 0.75rem; /* Moderate margin */
+    padding: 0.75rem; /* Moderate padding */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* Ensure padding is included in the total width */
+    font-size: 1rem; /* Moderate font size */
+  }
+  
+  .login-button, .toggle-button {
+    width: 100%; /* Make button take full width of the form */
+    padding: 0.75rem; /* Moderate padding */
     border: none;
-    border-radius: 5px;
+    border-radius: 4px;
     cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.login-button:hover {
-    background-color: #0056b3;
-}
+    margin-top: 1rem; /* Moderate margin */
+    font-size: 1rem; /* Moderate font size */
+    align-self: center; /* Center button horizontally */
+  }
+  
+  .login-button {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  .toggle-button {
+    background-color: #007bff;
+    color: white;
+  }
+  
