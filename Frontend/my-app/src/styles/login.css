@@ -1,67 +1,52 @@
-body, html {
-    height: 100%;
-    margin: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
-  }
-  
-  .login-container {
-    width: 100%;
-    max-width: 450px; /* Moderate max-width */
-    padding: 2rem; /* Moderate padding */
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    background-color: #fff;
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* Center items horizontally */
-  }
-  
-  .login-header {
-    text-align: center;
-    margin-bottom: 1rem;
-    font-size: 1.3rem; /* Moderate font size */
-  }
-  
-  .form {
-    width: 100%; /* Make the form take full width of the container */
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* Center items horizontally */
-  }
-  
-  .input-field {
-    width: 100%; /* Make input fields take full width of the form */
-    margin-bottom: 0.75rem; /* Moderate margin */
-    padding: 0.75rem; /* Moderate padding */
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box; /* Ensure padding is included in the total width */
-    font-size: 1rem; /* Moderate font size */
-  }
-  
-  .login-button, .toggle-button {
-    width: 100%; /* Make button take full width of the form */
-    padding: 0.75rem; /* Moderate padding */
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-top: 1rem; /* Moderate margin */
-    font-size: 1rem; /* Moderate font size */
-    align-self: center; /* Center button horizontally */
-  }
-  
-  .login-button {
-    background-color: #28a745;
-    color: white;
-  }
-  
-  .toggle-button {
-    background-color: #007bff;
-    color: white;
-  }
-  
+.login-container {
+  width: 300px;
+  margin: 100px auto;
+  padding: 20px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.login-header {
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+  text-align: center;
+  color: #333;
+}
+
+.login-input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.login-button {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  background-color: #007bff;
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.toggle-button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border: none;
+  background: none;
+  color: #007bff;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-align: center;
+}
+
+.toggle-button:hover {
+  text-decoration: underline;
+}
