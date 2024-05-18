@@ -3,97 +3,89 @@ import { useNavigate } from 'react-router-dom';
 import '../styles/login.css';
 
 const LoginPage = () => {
-  const [isSignUp, setIsSignUp] = useState(false);
-  const [loginForm, setLoginForm] = useState({ emailOrUsername: '', password: '' });
-  const [signUpForm, setSignUpForm] = useState({ email: '', password: '', name: '', surname: '' });
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('');
+  const [isSignup, setIsSignup] = useState(false);
   const navigate = useNavigate();
 
-  const handleLoginChange = (e) => {
-    const { name, value } = e.target;
-    setLoginForm({ ...loginForm, [name]: value });
+  const handleLogin = async () => {
+    try {
+      const response = await fetch('http://localhost:9000/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+      if (!data.success) {
+        throw new Error(data.error || 'Login failed');
+      }
+
+      console.log('Login successful:', data);
+      navigate('/home');
+    } catch (error) {
+      console.error('Error during login:', error);
+      alert('Login failed. Please check your credentials and try again.');
+    }
   };
 
-  const handleSignUpChange = (e) => {
-    const { name, value } = e.target;
-    setSignUpForm({ ...signUpForm, [name]: value });
-  };
+  const handleSignUp = async () => {
+    try {
+      const response = await fetch('http://localhost:9000/api/users/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, email, password }),
+      });
 
-  const handleLogin = () => {
-    // Perform login logic here
-    // If login is successful, navigate to the home page
-    navigate('/home');
-  };
+      const data = await response.json();
+      if (!data.success) {
+        throw new Error(data.error || 'Signup failed');
+      }
 
-  const handleSignUp = () => {
-    // Perform signup logic here
-    // If signup is successful, navigate to the home page or login page
-    navigate('/home');
+      console.log('Signup successful:', data);
+      navigate('/home');
+    } catch (error) {
+      console.error('Error during signup:', error);
+      alert('Signup failed. Please try again.');
+    }
   };
 
   return (
     <div className="login-container">
-      <h2 className="login-header">{isSignUp ? 'Sign Up' : 'Login'}</h2>
-      
-      {isSignUp ? (
-        <div className="form">
-          <input
-            type="text"
-            name="name"
-            value={signUpForm.name}
-            onChange={handleSignUpChange}
-            placeholder="Name"
-            className="input-field"
-          />
-          <input
-            type="text"
-            name="surname"
-            value={signUpForm.surname}
-            onChange={handleSignUpChange}
-            placeholder="Surname"
-            className="input-field"
-          />
-          <input
-            type="email"
-            name="email"
-            value={signUpForm.email}
-            onChange={handleSignUpChange}
-            placeholder="Email"
-            className="input-field"
-          />
-          <input
-            type="password"
-            name="password"
-            value={signUpForm.password}
-            onChange={handleSignUpChange}
-            placeholder="Password"
-            className="input-field"
-          />
-          <button className="login-button" onClick={handleSignUp}>Sign Up</button>
-        </div>
-      ) : (
-        <div className="form">
-          <input
-            type="text"
-            name="emailOrUsername"
-            value={loginForm.emailOrUsername}
-            onChange={handleLoginChange}
-            placeholder="Email or Username"
-            className="input-field"
-          />
-          <input
-            type="password"
-            name="password"
-            value={loginForm.password}
-            onChange={handleLoginChange}
-            placeholder="Password"
-            className="input-field"
-          />
-          <button className="login-button" onClick={handleLogin}>Login</button>
-        </div>
+      <h2 className="login-header">{isSignup ? 'Sign Up' : 'Login'}</h2>
+      {isSignup && (
+        <input
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          className="login-input"
+        />
       )}
-      
-      <button className="toggle-button" onClick={() => setIsSignUp(!isSignUp)}>
-        {isSignUp ? 'Already have an account? Login' : 'Don\'t have an account? Sign Up'}
+      <input
+        type="email"
+        placeholder="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        className="login-input"
+      />
+      <input
+        type="password"
+        placeholder="Password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        className="login-input"
+      />
+      <button className="login-button" onClick={isSignup ? handleSignUp : handleLogin}>
+        {isSignup ? 'Sign Up' : 'Login'}
+      </button>
+      <button className="toggle-button" onClick={() => setIsSignup(!isSignup)}>
+        {isSignup ? 'Have an account? Login' : 'Don\'t have an account? Sign Up'}
       </button>
     </div>
   );
