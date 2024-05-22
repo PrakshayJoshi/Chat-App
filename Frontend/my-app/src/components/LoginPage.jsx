@@ -5,8 +5,6 @@ import '../styles/login.css';
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [username, setUsername] = useState('');
-  const [isSignup, setIsSignup] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async () => {
@@ -32,41 +30,9 @@ const LoginPage = () => {
     }
   };
 
-  const handleSignUp = async () => {
-    try {
-      const response = await fetch('http://localhost:9000/api/users/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, email, password }),
-      });
-
-      const data = await response.json();
-      if (!data.success) {
-        throw new Error(data.error || 'Signup failed');
-      }
-
-      console.log('Signup successful:', data);
-      navigate('/home');
-    } catch (error) {
-      console.error('Error during signup:', error);
-      alert('Signup failed. Please try again.');
-    }
-  };
-
   return (
     <div className="login-container">
-      <h2 className="login-header">{isSignup ? 'Sign Up' : 'Login'}</h2>
-      {isSignup && (
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          className="login-input"
-        />
-      )}
+      <h2 className="login-header">Login</h2>
       <input
         type="email"
         placeholder="Email"
@@ -81,11 +47,11 @@ const LoginPage = () => {
         onChange={(e) => setPassword(e.target.value)}
         className="login-input"
       />
-      <button className="login-button" onClick={isSignup ? handleSignUp : handleLogin}>
-        {isSignup ? 'Sign Up' : 'Login'}
+      <button className="login-button" onClick={handleLogin}>
+        Login
       </button>
-      <button className="toggle-button" onClick={() => setIsSignup(!isSignup)}>
-        {isSignup ? 'Have an account? Login' : 'Don\'t have an account? Sign Up'}
+      <button className="toggle-button" onClick={() => navigate('/signup')}>
+        Don't have an account? Sign Up
       </button>
     </div>
   );
