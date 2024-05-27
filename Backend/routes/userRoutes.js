@@ -10,14 +10,13 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ success: false, error: 'All fields are required' });
     }
 
-    // Hash the password before saving
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const newUser = new User({
       username,
       email,
-      password: hashedPassword,  // Save the hashed password
+      password: hashedPassword,
       location,
     });
 
@@ -25,6 +24,31 @@ router.post('/register', async (req, res) => {
     res.status(201).json({ success: true, message: 'User registered successfully', user: newUser });
   } catch (error) {
     console.error('Error registering user:', error);
+    res.status(500).json({ success: false, error: 'Server error' });
+  }
+});
+
+router.patch('/:userId/location', async (req, res) => {
+  const { userId } = req.params;
+  const { latitude, longitude } = req.body;
+
+  try {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ success: false, error: 'User not found' });
+    }
+
+    user.location = {
+      type: 'Point',
+      coordinates: [longitude, latitude],
+    };
+
+    await user.save();
+    console.log('Location updated in database');
+    res.status(200).json({ success: true, message: 'Location updated' });
+  } catch (error) {
+    console.error('Error updating location:', error);
     res.status(500).json({ success: false, error: 'Server error' });
   }
 });

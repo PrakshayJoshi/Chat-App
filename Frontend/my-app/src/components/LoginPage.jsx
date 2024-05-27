@@ -1,58 +1,39 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../styles/login.css';
+import { useUser } from '../contexts/UserContext';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const { setUser } = useUser();
   const navigate = useNavigate();
 
   const handleLogin = async () => {
-    try {
-      const response = await fetch('http://localhost:9000/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
+    const response = await fetch('http://localhost:9000/api/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    });
 
-      const data = await response.json();
-      if (!data.success) {
-        throw new Error(data.error || 'Login failed');
-      }
-
-      console.log('Login successful:', data);
-      navigate('/home');
-    } catch (error) {
-      console.error('Error during login:', error);
-      alert('Login failed. Please check your credentials and try again.');
+    const data = await response.json();
+    if (data.success) {
+      setUser(data.user);
+      localStorage.setItem('userId', data.user._id);
+      navigate('/');
+    } else {
+      alert('Login failed');
     }
   };
 
   return (
-    <div className="login-container">
-      <h2 className="login-header">Login</h2>
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        className="login-input"
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        className="login-input"
-      />
-      <button className="login-button" onClick={handleLogin}>
-        Login
-      </button>
-      <button className="toggle-button" onClick={() => navigate('/signup')}>
-        Don't have an account? Sign Up
-      </button>
+    <div>
+      <h2>Login</h2>
+      <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" />
+      <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" />
+      <button onClick={handleLogin}>Login</button>
+      <button onClick={() => navigate('/signup')}>Signup</button>
     </div>
   );
 };
