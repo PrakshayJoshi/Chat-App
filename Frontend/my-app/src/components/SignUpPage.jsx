@@ -8,20 +8,25 @@ const SignUpPage = () => {
   const navigate = useNavigate();
 
   const handleSignup = async () => {
-    const location = await getCurrentLocation();
-    const response = await fetch('http://localhost:9000/api/users/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ username, email, password, location }),
-    });
+    try {
+      const location = await getCurrentLocation();
+      const response = await fetch('http://localhost:9000/api/users/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, email, password, location }), // Include location in the request body
+      });
 
-    const data = await response.json();
-    if (data.success) {
-      navigate('/login');
-    } else {
-      alert('Signup failed');
+      const data = await response.json();
+      if (data.success) {
+        navigate('/login');
+      } else {
+        alert('Signup failed');
+      }
+    } catch (error) {
+      console.error('Error during signup:', error);
+      alert('An error occurred during signup: ' + error.message);
     }
   };
 

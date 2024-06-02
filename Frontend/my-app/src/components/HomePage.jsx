@@ -11,10 +11,33 @@ const HomePage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!user) {
+    const token = localStorage.getItem('token');
+    if (!token) {
       navigate('/login');
+    } else {
+      fetch('http://localhost:9000/api/auth/validate-token', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            setUser({ id: data.user.id });
+            localStorage.setItem('userId', data.user.id); // Ensure userId is stored in localStorage
+          } else {
+            localStorage.removeItem('token');
+            localStorage.removeItem('userId');
+            navigate('/login');
+          }
+        })
+        .catch(() => {
+          localStorage.removeItem('token');
+          localStorage.removeItem('userId');
+          navigate('/login');
+        });
     }
-  }, [user, navigate]);
+  }, [navigate, setUser]);
 
   useEffect(() => {
     fetchMessages();
@@ -56,6 +79,7 @@ const HomePage = () => {
 
     try {
       const { latitude, longitude } = await getCurrentLocation();
+      console.log('Updating location for user:', userId); // Add logging to verify userId
       const response = await fetch(`http://localhost:9000/api/users/${userId}/location`, {
         method: 'PATCH',
         headers: {
@@ -65,7 +89,7 @@ const HomePage = () => {
       });
 
       if (response.ok) {
-        console.log('Updated Location');
+        console.log('Location updated');
       } else {
         console.error('Failed to update location');
       }
@@ -129,6 +153,7 @@ const HomePage = () => {
 
   return (
     <div className="container">
+      <h1>Welcome</h1>
       <h2 className="home-header">Home Page</h2>
       <div className="message-input-container">
         <input

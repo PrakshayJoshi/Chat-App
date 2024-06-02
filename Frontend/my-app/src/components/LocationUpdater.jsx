@@ -1,4 +1,3 @@
-// src/components/LocationUpdater.jsx
 import { useEffect } from 'react';
 import { useUser } from '../contexts/UserContext';
 
@@ -9,7 +8,7 @@ const LocationUpdater = () => {
     const userId = localStorage.getItem('userId');
 
     if (!userId) {
-      console.error('No user ID found in localStorage');
+      console.error('No user ID found');
       return;
     }
 

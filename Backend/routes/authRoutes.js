@@ -1,8 +1,10 @@
 const express = require('express');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
 const router = express.Router();
+const authController = require('../controllers/authController');
+
+router.post('/signup', authController.signup);
+router.post('/login', authController.login);
+router.get('/validate-token', authController.validateToken);
 
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
@@ -13,7 +15,7 @@ router.post('/login', async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ success: false, error: 'Invalid credentials' });
 
-    const token = jwt.sign({ userId: user._id }, 'your_jwt_secret', { expiresIn: '1h' });
+    const token = jwt.sign({ userId: user._id }, '7A3B234D3A172E83BBD9ABCC7AE1F', { expiresIn: '1h' });
     res.json({ success: true, token, user });
   } catch (error) {
     console.error('Error logging in:', error);
