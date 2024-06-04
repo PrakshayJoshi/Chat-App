@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import "../styles/SignUpPage.css";
 
 const SignUpPage = () => {
   const [username, setUsername] = useState('');
@@ -47,14 +48,15 @@ const SignUpPage = () => {
       }
     });
   };
-
+ 
   return (
-    <div>
+    <div className="signup-container">
       <h2>Signup</h2>
-      <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" />
-      <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" />
-      <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" />
-      <button onClick={handleSignup}>Signup</button>
+      <input className="signup-input" type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" />
+      <input className="signup-input" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" />
+      <input className="signup-input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" />
+      <button className="signup-button" onClick={handleSignup}>Signup</button>
+      <p>Already have an account? <button className="toggle-button" onClick={() => navigate('/login')}>Login</button></p>
     </div>
   );
 };

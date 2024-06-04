@@ -75,7 +75,9 @@ exports.login = async (req, res) => {
   }
 };
 
-exports.validateToken = (req, res) => {
+// authController.js
+
+exports.validateToken = async (req, res) => {
   const token = req.header('Authorization').replace('Bearer ', '');
 
   if (!token) {
@@ -84,11 +86,13 @@ exports.validateToken = (req, res) => {
 
   try {
     const decoded = jwt.verify(token, '7A3B234D3A172E83BBD9ABCC7AE1F');
-    res.json({ success: true, user: decoded.user });
+    const user = await User.findById(decoded.user.id);
+    res.json({ success: true, user: { id: user.id, username: user.username } });
   } catch (error) {
     res.status(401).json({ success: false, message: 'Token is not valid' });
   }
 };
+
 
 exports.register = async (req, res) => {
   try {

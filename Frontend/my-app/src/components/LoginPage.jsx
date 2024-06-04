@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
+import "../styles/LoginPage.css";
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -34,22 +35,24 @@ const LoginPage = () => {
   };
 
   return (
-    <div>
-      <h2>Login</h2>
+    <div className="login-container">
+      <h2 className="login-header">Login</h2>
       <input
+        className="login-input"
         type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="Email"
       />
       <input
+        className="login-input"
         type="password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         placeholder="Password"
       />
-      <button onClick={handleLogin}>Login</button>
-      <button onClick={() => navigate('/signup')}>Signup</button>
+      <button className="login-button" onClick={handleLogin}>Login</button>
+      <p>Don't have an account? <button className="toggle-button" onClick={() => navigate('/signup')}>Signup</button> </p>
     </div>
   );
 };

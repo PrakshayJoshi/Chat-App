@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useUser } from '../contexts/UserContext';
 import { useNavigate } from 'react-router-dom';
+import '../styles/HomePage.css';
+
+
 
 const HomePage = () => {
-  const { user, setUser } = useUser();
+  const { setUser } = useUser();
+  const [user, setUserState] = useState(null);
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -23,8 +27,10 @@ const HomePage = () => {
         .then(response => response.json())
         .then(data => {
           if (data.success) {
-            setUser({ id: data.user.id });
+            setUser({ id: data.user.id, username: data.user.username });
             localStorage.setItem('userId', data.user.id); // Ensure userId is stored in localStorage
+            setUserState({ id: data.user.id, username: data.user.username }); // Set user state with both id and username
+            setLoading(false);
           } else {
             localStorage.removeItem('token');
             localStorage.removeItem('userId');
@@ -61,7 +67,7 @@ const HomePage = () => {
         throw new Error('Failed to fetch messages');
       }
       const data = await response.json();
-      setMessages(data.reverse());
+      setMessages(data);
       setLoading(false);
     } catch (error) {
       console.error('Failed to fetch messages:', error);
@@ -150,10 +156,17 @@ const HomePage = () => {
       }
     }
   };
+  
+
+  const handleLogout = () => {
+    localStorage.removeItem('token'); // Clear token from local storage
+    setUser(null); // Clear user state
+    navigate('/login'); // Navigate to login page
+  };
 
   return (
     <div className="container">
-      <h1>Welcome</h1>
+      <h1>Welcome {user && user.username}</h1>
       <h2 className="home-header">Home Page</h2>
       <div className="message-input-container">
         <input
@@ -164,15 +177,16 @@ const HomePage = () => {
           onKeyDown={handleKeyDown}
         />
         <button onClick={sendMessage}>Send</button>
+        <button onClick={handleLogout}>Logout</button>
       </div>
       {loading && <p>Loading...</p>}
       {error && <p>{error}</p>}
-      <div className="message-list">
+      <div className="messages-container">
         {messages.map((msg, index) => (
-          <div key={index} className="message-item">
+          <div key={index} className="message">
             <p>{msg.text}</p>
             {msg.location && (
-              <p>
+              <p className="message-location">
                 Location: Latitude {msg.location.latitude}, Longitude {msg.location.longitude}
               </p>
             )}
