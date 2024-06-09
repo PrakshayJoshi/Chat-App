@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useUser } from '../contexts/UserContext';
 import { useNavigate } from 'react-router-dom';
 import '../styles/HomePage.css';
-
-
+import MessageInputComponent from './MessageInputComponent';
+import SearchPlaceComponent from './SearchPlaceComponent';
+import MessageListComponent from './MessageListComponent';
+import LogoutButtonComponent from './LogoutButtonComponent';
 
 const HomePage = () => {
   const { setUser } = useUser();
@@ -12,7 +14,36 @@ const HomePage = () => {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [destination, setDestination] = useState(null);
   const navigate = useNavigate();
+
+  const updateLocation = useCallback(async () => {
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+      console.error('No user ID found in localStorage');
+      return;
+    }
+
+    try {
+      const { latitude, longitude } = await getCurrentLocation();
+      console.log('Updating location for user:', userId);
+      const response = await fetch(`http://localhost:9000/api/users/${userId}/location`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ latitude, longitude }),
+      });
+
+      if (response.ok) {
+        console.log('Location updated');
+      } else {
+        console.error('Failed to update location');
+      }
+    } catch (error) {
+      console.error('Error updating location:', error);
+    }
+  }, []);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -28,8 +59,8 @@ const HomePage = () => {
         .then(data => {
           if (data.success) {
             setUser({ id: data.user.id, username: data.user.username });
-            localStorage.setItem('userId', data.user.id); // Ensure userId is stored in localStorage
-            setUserState({ id: data.user.id, username: data.user.username }); // Set user state with both id and username
+            localStorage.setItem('userId', data.user.id);
+            setUserState({ id: data.user.id, username: data.user.username });
             setLoading(false);
           } else {
             localStorage.removeItem('token');
@@ -56,9 +87,9 @@ const HomePage = () => {
   }, [messages]);
 
   useEffect(() => {
-    const intervalId = setInterval(updateLocation, 30000); // Update location every 30 seconds
+    const intervalId = setInterval(updateLocation, 30000);
     return () => clearInterval(intervalId);
-  }, []);
+  }, [updateLocation]);
 
   const fetchMessages = async () => {
     try {
@@ -73,34 +104,6 @@ const HomePage = () => {
       console.error('Failed to fetch messages:', error);
       setError(error.message);
       setLoading(false);
-    }
-  };
-
-  const updateLocation = async () => {
-    const userId = localStorage.getItem('userId');
-    if (!userId) {
-      console.error('No user ID found in localStorage');
-      return;
-    }
-
-    try {
-      const { latitude, longitude } = await getCurrentLocation();
-      console.log('Updating location for user:', userId); // Add logging to verify userId
-      const response = await fetch(`http://localhost:9000/api/users/${userId}/location`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ latitude, longitude }),
-      });
-
-      if (response.ok) {
-        console.log('Location updated');
-      } else {
-        console.error('Failed to update location');
-      }
-    } catch (error) {
-      console.error('Error updating location:', error);
     }
   };
 
@@ -132,9 +135,13 @@ const HomePage = () => {
     if (message.trim() !== '') {
       try {
         const location = await getCurrentLocation();
+        const timestamp = new Date().toISOString();
         const messageObject = {
           text: message,
           location: location,
+          destination: destination,
+          timestamp: timestamp,
+          userId: user.id
         };
 
         const response = await fetch('http://localhost:9000/api/messages/send', {
@@ -156,43 +163,28 @@ const HomePage = () => {
       }
     }
   };
-  
 
   const handleLogout = () => {
-    localStorage.removeItem('token'); // Clear token from local storage
-    setUser(null); // Clear user state
-    navigate('/login'); // Navigate to login page
+    localStorage.removeItem('token');
+    setUser(null);
+    navigate('/login');
   };
 
   return (
     <div className="container">
       <h1>Welcome {user && user.username}</h1>
       <h2 className="home-header">Home Page</h2>
-      <div className="message-input-container">
-        <input
-          type="text"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder="Type your message..."
-          onKeyDown={handleKeyDown}
-        />
-        <button onClick={sendMessage}>Send</button>
-        <button onClick={handleLogout}>Logout</button>
-      </div>
+      <MessageInputComponent
+        message={message}
+        setMessage={setMessage}
+        handleKeyDown={handleKeyDown}
+        sendMessage={sendMessage}
+      />
+      <SearchPlaceComponent setDestination={setDestination} />
+      <LogoutButtonComponent handleLogout={handleLogout} />
       {loading && <p>Loading...</p>}
       {error && <p>{error}</p>}
-      <div className="messages-container">
-        {messages.map((msg, index) => (
-          <div key={index} className="message">
-            <p>{msg.text}</p>
-            {msg.location && (
-              <p className="message-location">
-                Location: Latitude {msg.location.latitude}, Longitude {msg.location.longitude}
-              </p>
-            )}
-          </div>
-        ))}
-      </div>
+      <MessageListComponent messages={messages} />
     </div>
   );
 };

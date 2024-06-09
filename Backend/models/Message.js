@@ -1,12 +1,32 @@
+// models/Message.js
 const mongoose = require('mongoose');
 
-const MessageSchema = new mongoose.Schema({
-  text: { type: String, required: true },
-  location: {
-    latitude: { type: Number, required: true },
-    longitude: { type: Number, required: true },
-  },
-  createdAt: { type: Date, default: Date.now },
+const locationSchema = new mongoose.Schema({
+    latitude: {
+        type: Number,
+        required: true
+    },
+    longitude: {
+        type: Number,
+        required: true
+    }
 });
 
-module.exports = mongoose.model('Message', MessageSchema);
+const messageSchema = new mongoose.Schema({
+    text: {
+        type: String,
+        required: true
+    },
+    location: {
+        type: locationSchema,
+        required: true
+    },
+    destination: {
+        type: locationSchema,
+        required: true
+    }
+});
+
+const Message = mongoose.model('Message', messageSchema);
+
+module.exports = Message;
