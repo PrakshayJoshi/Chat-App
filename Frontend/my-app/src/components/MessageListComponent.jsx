@@ -1,4 +1,5 @@
 import React from 'react';
+import '../styles/MessageListComponent.css';
 
 const MessageListComponent = ({ messages }) => {
   return (

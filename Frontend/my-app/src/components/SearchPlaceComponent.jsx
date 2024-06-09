@@ -1,4 +1,5 @@
 import React, { useRef, useEffect } from 'react';
+import '../styles/SearchPlaceComponent.css';
 
 const SearchPlaceComponent = ({ setDestination }) => {
   const searchBoxRef = useRef(null);
@@ -27,6 +28,7 @@ const SearchPlaceComponent = ({ setDestination }) => {
 
   return (
     <input
+      className="search-place-input"
       type="text"
       placeholder="Search for a place"
       ref={searchBoxRef}

@@ -1,4 +1,5 @@
 import React from 'react';
+import '../styles/MessageInputComponent.css';
 
 const MessageInputComponent = ({ message, setMessage, handleKeyDown, sendMessage }) => {
   return (
