@@ -1,4 +1,3 @@
-// models/Message.js
 const mongoose = require('mongoose');
 
 const locationSchema = new mongoose.Schema({
@@ -24,6 +23,10 @@ const messageSchema = new mongoose.Schema({
     destination: {
         type: locationSchema,
         required: true
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now // Automatically set the current timestamp when a message is created
     }
 });
 

@@ -6,42 +6,9 @@
   <title>React App</title>
   <!-- Google Places Autocomplete API -->
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDHwPZ-34X-zriMdx_Wz_RIYk43H4sAeGU&libraries=places"></script>
-  <style>
-    /* Optional: Add some styling for the autocomplete input */
-    #autocomplete {
-      width: 300px;
-      margin: 0 auto;
-      padding: 10px;
-      font-size: 16px;
-    }
-  </style>
 </head>
 <body>
   <div id="root"></div>
   <!-- Other static files and scripts -->
-
-  <!-- Add a text input field for the autocomplete -->
-  <input type="text" id="autocomplete" placeholder="Enter a location">
-
-  <script>
-    // Initialize the Google Places Autocomplete service
-    function initAutocomplete() {
-      const input = document.getElementById('autocomplete');
-      const autocomplete = new google.maps.places.Autocomplete(input);
-      // Optional: Set additional options for the Autocomplete service
-      // autocomplete.setOptions({types: ['geocode']});
-      // Optional: Listen for place changes
-      // autocomplete.addListener('place_changed', () => {
-      //   const place = autocomplete.getPlace();
-      //   console.log(place);
-      // });
-    }
-  </script>
-  <!-- Load the Autocomplete service after the page has loaded -->
-  <script>
-    window.addEventListener('load', () => {
-      initAutocomplete();
-    });
-  </script>
 </body>
 </html>

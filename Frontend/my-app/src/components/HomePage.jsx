@@ -135,12 +135,12 @@ const HomePage = () => {
     if (message.trim() !== '') {
       try {
         const location = await getCurrentLocation();
-        const timestamp = new Date().toISOString();
+        const createdAt = new Date().toISOString();
         const messageObject = {
           text: message,
           location: location,
           destination: destination,
-          timestamp: timestamp,
+          createdAt: createdAt,
           userId: user.id
         };
 
@@ -156,8 +156,13 @@ const HomePage = () => {
         console.log('Success:', data);
         if (data.success) {
           setMessages([data.message, ...messages]);
+          setMessage('');
+          setDestination(null); // Clear the destination after sending the message
+          const searchBox = document.querySelector('input[type="text"][placeholder="Search for a place"]');
+          if (searchBox) {
+            searchBox.value = ''; // Clear the search box
+          }
         }
-        setMessage('');
       } catch (error) {
         console.error('Error sending message:', error);
       }

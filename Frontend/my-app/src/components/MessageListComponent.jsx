@@ -16,7 +16,9 @@ const MessageListComponent = ({ messages }) => {
               Destination: Latitude {msg.destination.latitude}, Longitude {msg.destination.longitude}
             </p>
           )}
-          <p className="message-timestamp">Time: {new Date(msg.timestamp).toLocaleString()}</p>
+          <p className="message-createdAt">
+            Created At: {new Date(msg.createdAt).toLocaleString()}
+          </p>
         </div>
       ))}
     </div>

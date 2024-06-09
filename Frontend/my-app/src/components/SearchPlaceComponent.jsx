@@ -22,12 +22,6 @@ const SearchPlaceComponent = ({ setDestination }) => {
 
     if (window.google && window.google.maps && window.google.maps.places) {
       initializeAutocomplete();
-    } else {
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDHwPZ-34X-zriMdx_Wz_RIYk43H4sAeGU&libraries=places`;
-      script.async = true;
-      script.onload = initializeAutocomplete;
-      document.body.appendChild(script);
     }
   }, [setDestination]);
 
