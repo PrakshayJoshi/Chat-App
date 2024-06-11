@@ -6,6 +6,7 @@ import MessageInputComponent from './MessageInputComponent';
 import SearchPlaceComponent from './SearchPlaceComponent';
 import MessageListComponent from './MessageListComponent';
 import LogoutButtonComponent from './LogoutButtonComponent';
+import EditMessageComponent from './EditMessageComponent';
 
 const HomePage = () => {
   const { setUser } = useUser();
@@ -16,6 +17,8 @@ const HomePage = () => {
   const [error, setError] = useState(null);
   const [destination, setDestination] = useState(null);
   const navigate = useNavigate();
+  const [editingMessage, setEditingMessage] = useState(null); // New state for editing messages
+
 
   const updateLocation = useCallback(async () => {
     const userId = localStorage.getItem('userId');
@@ -169,6 +172,38 @@ const HomePage = () => {
     }
   };
 
+  const startEditMessage = (message) => {
+    setEditingMessage(message);
+  };
+
+  const cancelEditMessage = () => {
+    setEditingMessage(null);
+  };
+
+  const saveEditMessage = async (updatedMessage) => {
+    try {
+      const response = await fetch(`http://localhost:9000/api/messages/${updatedMessage._id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedMessage),
+      });
+
+      if (response.ok) {
+        const updatedMessages = messages.map((msg) =>
+          msg._id === updatedMessage._id ? updatedMessage : msg
+        );
+        setMessages(updatedMessages);
+        setEditingMessage(null);
+      } else {
+        console.error('Failed to update message');
+      }
+    } catch (error) {
+      console.error('Error updating message:', error);
+    }
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('token');
     setUser(null);
@@ -189,7 +224,14 @@ const HomePage = () => {
       <LogoutButtonComponent handleLogout={handleLogout} />
       {loading && <p>Loading...</p>}
       {error && <p>{error}</p>}
-      <MessageListComponent messages={messages} />
+      <MessageListComponent messages={messages} startEditMessage={startEditMessage} />
+      {editingMessage && (
+        <EditMessageComponent
+          message={editingMessage}
+          saveEditMessage={saveEditMessage}
+          cancelEditMessage={cancelEditMessage}
+        />
+      )}
     </div>
   );
 };

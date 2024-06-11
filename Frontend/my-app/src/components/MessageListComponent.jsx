@@ -1,7 +1,7 @@
 import React from 'react';
 import '../styles/MessageListComponent.css';
 
-const MessageListComponent = ({ messages }) => {
+const MessageListComponent = ({ messages, startEditMessage }) => {
   return (
     <div className="messages-container">
       {messages.map((msg, index) => (
@@ -20,6 +20,7 @@ const MessageListComponent = ({ messages }) => {
           <p className="message-createdAt">
             Created At: {new Date(msg.createdAt).toLocaleString()}
           </p>
+          <button onClick={() => startEditMessage(msg)}>Edit</button>
         </div>
       ))}
     </div>
