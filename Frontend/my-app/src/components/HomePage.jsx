@@ -143,10 +143,15 @@ const HomePage = () => {
           text: message,
           location: location,
           destination: destination,
+          boundary: destination ? { // Add boundary information
+            type: 'circle',
+            radius: 1000, // Example radius in meters
+            center: destination
+          } : null,
           createdAt: createdAt,
           userId: user.id
         };
-
+  
         const response = await fetch('http://localhost:9000/api/messages/send', {
           method: 'POST',
           headers: {
@@ -154,7 +159,7 @@ const HomePage = () => {
           },
           body: JSON.stringify(messageObject),
         });
-
+  
         const data = await response.json();
         console.log('Success:', data);
         if (data.success) {
@@ -171,6 +176,7 @@ const HomePage = () => {
       }
     }
   };
+  
 
   const startEditMessage = (message) => {
     setEditingMessage(message);
@@ -221,7 +227,6 @@ const HomePage = () => {
         sendMessage={sendMessage}
       />
       <SearchPlaceComponent setDestination={setDestination} />
-      <LogoutButtonComponent handleLogout={handleLogout} />
       {loading && <p>Loading...</p>}
       {error && <p>{error}</p>}
       <MessageListComponent messages={messages} startEditMessage={startEditMessage} />
@@ -232,6 +237,7 @@ const HomePage = () => {
           cancelEditMessage={cancelEditMessage}
         />
       )}
+      <LogoutButtonComponent handleLogout={handleLogout} />
     </div>
   );
 };
