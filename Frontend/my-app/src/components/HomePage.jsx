@@ -17,6 +17,7 @@ const HomePage = () => {
   const [error, setError] = useState(null);
   const [destination, setDestination] = useState(null);
   const navigate = useNavigate();
+  const [nearbyUsers, setNearbyUsers] = useState([]);
   const [editingMessage, setEditingMessage] = useState(null); // New state for editing messages
 
 
@@ -216,29 +217,56 @@ const HomePage = () => {
     navigate('/login');
   };
 
+  const fetchNearbyUsers = async () => {
+    if (!destination) return;
+
+    try {
+      const response = await fetch(`http://localhost:9000/api/users/nearby?latitude=${destination.latitude}&longitude=${destination.longitude}&radius=1`); // 1 km radius
+      const data = await response.json();
+      if (data.success) {
+        setNearbyUsers(data.users);
+      } else {
+        console.error('Failed to fetch nearby users');
+      }
+    } catch (error) {
+      console.error('Error fetching nearby users:', error);
+    }
+  };
+
   return (
     <div className="container">
-      <h1>Welcome {user && user.username}</h1>
-      <h2 className="home-header">Home Page</h2>
-      <MessageInputComponent
-        message={message}
-        setMessage={setMessage}
-        handleKeyDown={handleKeyDown}
-        sendMessage={sendMessage}
+    <h1>Welcome {user && user.username}</h1>
+    <h2 className="home-header">Home Page</h2>
+    <MessageInputComponent
+      message={message}
+      setMessage={setMessage}
+      handleKeyDown={handleKeyDown}
+      sendMessage={sendMessage}
+    />
+    <SearchPlaceComponent setDestination={setDestination} />
+    <button onClick={fetchNearbyUsers}>Find Nearby Users</button> {/* New button */}
+    {nearbyUsers.length > 0 && (
+      <div className="nearby-users">
+        <h3>Users near the destination:</h3>
+        <ul>
+          {nearbyUsers.map((user) => (
+            <li key={user._id}>{user.username}</li>
+          ))}
+        </ul>
+      </div>
+    )}
+    {loading && <p>Loading...</p>}
+    {error && <p>{error}</p>}
+    <MessageListComponent messages={messages} startEditMessage={startEditMessage} />
+    {editingMessage && (
+      <EditMessageComponent
+        message={editingMessage}
+        saveEditMessage={saveEditMessage}
+        cancelEditMessage={cancelEditMessage}
       />
-      <SearchPlaceComponent setDestination={setDestination} />
-      {loading && <p>Loading...</p>}
-      {error && <p>{error}</p>}
-      <MessageListComponent messages={messages} startEditMessage={startEditMessage} />
-      {editingMessage && (
-        <EditMessageComponent
-          message={editingMessage}
-          saveEditMessage={saveEditMessage}
-          cancelEditMessage={cancelEditMessage}
-        />
-      )}
-      <LogoutButtonComponent handleLogout={handleLogout} />
-    </div>
+    )}
+    <LogoutButtonComponent handleLogout={handleLogout} />
+  </div>
   );
 };
 

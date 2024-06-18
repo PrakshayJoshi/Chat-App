@@ -53,4 +53,27 @@ router.patch('/:userId/location', async (req, res) => {
   }
 });
 
+router.get('/nearby', async (req, res) => {
+  const { latitude, longitude, radius } = req.query;
+
+  if (!latitude || !longitude || !radius) {
+    return res.status(400).json({ success: false, message: 'Missing required query parameters' });
+  }
+
+  try {
+    const users = await User.find({
+      location: {
+        $geoWithin: {
+          $centerSphere: [[longitude, latitude], radius / 6378.1] // radius in radians
+        }
+      }
+    });
+
+    res.status(200).json({ success: true, users });
+  } catch (error) {
+    console.error('Error fetching nearby users:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
 module.exports = router;
