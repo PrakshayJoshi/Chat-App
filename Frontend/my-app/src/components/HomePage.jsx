@@ -18,8 +18,7 @@ const HomePage = () => {
   const [destination, setDestination] = useState(null);
   const navigate = useNavigate();
   const [nearbyUsers, setNearbyUsers] = useState([]);
-  const [editingMessage, setEditingMessage] = useState(null); // New state for editing messages
-
+  const [editingMessage, setEditingMessage] = useState(null);
 
   const updateLocation = useCallback(async () => {
     const userId = localStorage.getItem('userId');
@@ -145,14 +144,13 @@ const HomePage = () => {
           location: location,
           destination: destination,
           boundary: destination ? { // Add boundary information
-            type: 'circle',
-            radius: 1000, // Example radius in meters
-            center: destination
+            type: 'rectangle',
+            coordinates: destination.boundary // Using the destination's boundary
           } : null,
           createdAt: createdAt,
           userId: user.id
         };
-  
+
         const response = await fetch('http://localhost:9000/api/messages/send', {
           method: 'POST',
           headers: {
@@ -160,7 +158,7 @@ const HomePage = () => {
           },
           body: JSON.stringify(messageObject),
         });
-  
+
         const data = await response.json();
         console.log('Success:', data);
         if (data.success) {
@@ -177,7 +175,6 @@ const HomePage = () => {
       }
     }
   };
-  
 
   const startEditMessage = (message) => {
     setEditingMessage(message);
@@ -221,7 +218,15 @@ const HomePage = () => {
     if (!destination) return;
 
     try {
-      const response = await fetch(`http://localhost:9000/api/users/nearby?latitude=${destination.latitude}&longitude=${destination.longitude}&radius=1`); // 1 km radius
+      const { latitude, longitude, boundary } = destination;
+      const queryParams = new URLSearchParams({
+        latitude,
+        longitude,
+        northeast: JSON.stringify(boundary.northeast),
+        southwest: JSON.stringify(boundary.southwest)
+      });
+
+      const response = await fetch(`http://localhost:9000/api/users/nearby?${queryParams.toString()}`);
       const data = await response.json();
       if (data.success) {
         setNearbyUsers(data.users);
@@ -235,38 +240,38 @@ const HomePage = () => {
 
   return (
     <div className="container">
-    <h1>Welcome {user && user.username}</h1>
-    <h2 className="home-header">Home Page</h2>
-    <MessageInputComponent
-      message={message}
-      setMessage={setMessage}
-      handleKeyDown={handleKeyDown}
-      sendMessage={sendMessage}
-    />
-    <SearchPlaceComponent setDestination={setDestination} />
-    <button onClick={fetchNearbyUsers}>Find Nearby Users</button> {/* New button */}
-    {nearbyUsers.length > 0 && (
-      <div className="nearby-users">
-        <h3>Users near the destination:</h3>
-        <ul>
-          {nearbyUsers.map((user) => (
-            <li key={user._id}>{user.username}</li>
-          ))}
-        </ul>
-      </div>
-    )}
-    {loading && <p>Loading...</p>}
-    {error && <p>{error}</p>}
-    <MessageListComponent messages={messages} startEditMessage={startEditMessage} />
-    {editingMessage && (
-      <EditMessageComponent
-        message={editingMessage}
-        saveEditMessage={saveEditMessage}
-        cancelEditMessage={cancelEditMessage}
+      <h1>Welcome {user && user.username}</h1>
+      <h2 className="home-header">Home Page</h2>
+      <MessageInputComponent
+        message={message}
+        setMessage={setMessage}
+        handleKeyDown={handleKeyDown}
+        sendMessage={sendMessage}
       />
-    )}
-    <LogoutButtonComponent handleLogout={handleLogout} />
-  </div>
+      <SearchPlaceComponent setDestination={setDestination} />
+      <button onClick={fetchNearbyUsers}>Find Nearby Users</button>
+      {nearbyUsers.length > 0 && (
+        <div className="nearby-users">
+          <h3>Users near the destination:</h3>
+          <ul>
+            {nearbyUsers.map((user) => (
+              <li key={user._id}>{user.username}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {loading && <p>Loading...</p>}
+      {error && <p>{error}</p>}
+      <MessageListComponent messages={messages} startEditMessage={startEditMessage} />
+      {editingMessage && (
+        <EditMessageComponent
+          message={editingMessage}
+          saveEditMessage={saveEditMessage}
+          cancelEditMessage={cancelEditMessage}
+        />
+      )}
+      <LogoutButtonComponent handleLogout={handleLogout} />
+    </div>
   );
 };
 

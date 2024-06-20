@@ -25,7 +25,7 @@ const SearchPlaceComponent = ({ setDestination }) => {
     initializeAutocomplete();
   }, []);
 
-  const onPlaceChanged = (autocomplete) => {
+  const onPlaceChanged = async (autocomplete) => {
     const place = autocomplete.getPlace();
 
     if (!place.geometry) {
@@ -34,15 +34,17 @@ const SearchPlaceComponent = ({ setDestination }) => {
     }
 
     const location = place.geometry.location;
+    const viewport = place.geometry.viewport;
+
+    const boundary = {
+      northeast: { lat: viewport.getNorthEast().lat(), lng: viewport.getNorthEast().lng() },
+      southwest: { lat: viewport.getSouthWest().lat(), lng: viewport.getSouthWest().lng() }
+    };
+
     setDestination({
       latitude: location.lat(),
       longitude: location.lng(),
-      viewport: {
-        north: place.geometry.viewport.getNorthEast().lat(),
-        east: place.geometry.viewport.getNorthEast().lng(),
-        south: place.geometry.viewport.getSouthWest().lat(),
-        west: place.geometry.viewport.getSouthWest().lng(),
-      },
+      boundary
     });
 
     const map = new window.google.maps.Map(mapRef.current, {
@@ -64,16 +66,11 @@ const SearchPlaceComponent = ({ setDestination }) => {
       polygonRef.current.setMap(null);
     }
 
-    const bounds = new window.google.maps.LatLngBounds(
-      place.geometry.viewport.getSouthWest(),
-      place.geometry.viewport.getNorthEast()
-    );
-
     const polygonCoords = [
-      { lat: bounds.getNorthEast().lat(), lng: bounds.getNorthEast().lng() },
-      { lat: bounds.getNorthEast().lat(), lng: bounds.getSouthWest().lng() },
-      { lat: bounds.getSouthWest().lat(), lng: bounds.getSouthWest().lng() },
-      { lat: bounds.getSouthWest().lat(), lng: bounds.getNorthEast().lng() },
+      { lat: boundary.northeast.lat, lng: boundary.northeast.lng },
+      { lat: boundary.northeast.lat, lng: boundary.southwest.lng },
+      { lat: boundary.southwest.lat, lng: boundary.southwest.lng },
+      { lat: boundary.southwest.lat, lng: boundary.northeast.lng },
     ];
 
     const polygon = new window.google.maps.Polygon({
@@ -87,6 +84,30 @@ const SearchPlaceComponent = ({ setDestination }) => {
 
     polygon.setMap(map);
     polygonRef.current = polygon;
+
+    // Fetch nearby users
+    await fetchNearbyUsers(location.lat(), location.lng(), boundary);
+  };
+
+  const fetchNearbyUsers = async (latitude, longitude, boundary) => {
+    try {
+      const queryParams = new URLSearchParams({
+        latitude,
+        longitude,
+        northeast: JSON.stringify(boundary.northeast),
+        southwest: JSON.stringify(boundary.southwest)
+      });
+
+      const response = await fetch(`http://localhost:9000/api/users/nearby?${queryParams.toString()}`);
+      const data = await response.json();
+      if (data.success) {
+        console.log('Nearby users:', data.users);
+      } else {
+        console.error('Failed to fetch nearby users');
+      }
+    } catch (error) {
+      console.error('Error fetching nearby users:', error);
+    }
   };
 
   return (
