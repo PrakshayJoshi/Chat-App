@@ -96,7 +96,9 @@ const HomePage = () => {
 
   const fetchMessages = async () => {
     try {
-      const response = await fetch('http://localhost:9000/api/messages');
+      const { latitude, longitude } = await getCurrentLocation();
+      const userId = localStorage.getItem('userId');
+      const response = await fetch(`http://localhost:9000/api/messages?userId=${userId}&latitude=${latitude}&longitude=${longitude}`);
       if (!response.ok) {
         throw new Error('Failed to fetch messages');
       }
@@ -134,6 +136,53 @@ const HomePage = () => {
     }
   };
 
+  // const sendMessage = async () => {
+  //   if (message.trim() !== '') {
+  //     try {
+  //       const location = await getCurrentLocation();
+  //       const createdAt = new Date().toISOString();
+  //       const messageObject = {
+  //         text: message,
+  //         location: location,
+  //         destination: destination,
+  //         boundary: destination ? {
+  //           northeast: destination.boundary.northeast,
+  //           southwest: destination.boundary.southwest,
+  //         } : null,
+  //         createdAt: createdAt,
+  //         userId: user.id,
+  //       };
+
+  //       console.log('Sending message:', messageObject);  // Debugging statement
+
+  //       const response = await fetch('http://localhost:9000/api/messages/send', {
+  //         method: 'POST',
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //         },
+  //         body: JSON.stringify(messageObject),
+  //       });
+
+  //       const data = await response.json();
+  //       console.log('Response data:', data);  // Debugging statement
+
+  //       if (data.success) {
+  //         setMessages([data.message, ...messages]);
+  //         setMessage('');
+  //         setDestination(null);
+  //         const searchBox = document.querySelector('input[type="text"][placeholder="Search for a place"]');
+  //         if (searchBox) {
+  //           searchBox.value = '';
+  //         }
+  //       } else {
+  //         console.error('Failed to send message:', data.message);  // Handle backend error response
+  //       }
+  //     } catch (error) {
+  //       console.error('Error sending message:', error);  // Debugging statement
+  //     }
+  //   }
+  // };
+
   const sendMessage = async () => {
     if (message.trim() !== '') {
       try {
@@ -143,14 +192,16 @@ const HomePage = () => {
           text: message,
           location: location,
           destination: destination,
-          boundary: destination ? { // Add boundary information
-            type: 'rectangle',
-            coordinates: destination.boundary // Using the destination's boundary
+          boundary: destination ? {
+            northeast: destination.boundary.northeast,
+            southwest: destination.boundary.southwest,
           } : null,
           createdAt: createdAt,
-          userId: user.id
+          userId: user.id,
         };
-
+  
+        console.log('Sending message:', messageObject);
+  
         const response = await fetch('http://localhost:9000/api/messages/send', {
           method: 'POST',
           headers: {
@@ -158,23 +209,27 @@ const HomePage = () => {
           },
           body: JSON.stringify(messageObject),
         });
-
+  
         const data = await response.json();
-        console.log('Success:', data);
-        if (data.success) {
+        console.log('Response data:', data);
+  
+        if (response.ok && data.success) {
           setMessages([data.message, ...messages]);
           setMessage('');
-          setDestination(null); // Clear the destination after sending the message
+          setDestination(null);
           const searchBox = document.querySelector('input[type="text"][placeholder="Search for a place"]');
           if (searchBox) {
-            searchBox.value = ''; // Clear the search box
+            searchBox.value = '';
           }
+        } else {
+          console.error('Failed to send message:', data.message); // Log backend error message
         }
       } catch (error) {
         console.error('Error sending message:', error);
       }
     }
   };
+  
 
   const startEditMessage = (message) => {
     setEditingMessage(message);
@@ -215,8 +270,11 @@ const HomePage = () => {
   };
 
   const fetchNearbyUsers = async () => {
-    if (!destination) return;
-
+    if (!destination) {
+      console.error('No destination set');
+      return;
+    }
+  
     try {
       const { latitude, longitude, boundary } = destination;
       const queryParams = new URLSearchParams({
@@ -225,9 +283,13 @@ const HomePage = () => {
         northeast: JSON.stringify(boundary.northeast),
         southwest: JSON.stringify(boundary.southwest)
       });
-
+  
+      console.log('Fetching nearby users with query params:', queryParams.toString());
+  
       const response = await fetch(`http://localhost:9000/api/users/nearby?${queryParams.toString()}`);
       const data = await response.json();
+      console.log('Nearby users response data:', data);
+  
       if (data.success) {
         setNearbyUsers(data.users);
       } else {
@@ -237,6 +299,8 @@ const HomePage = () => {
       console.error('Error fetching nearby users:', error);
     }
   };
+  
+   
 
   return (
     <div className="container">
@@ -249,7 +313,7 @@ const HomePage = () => {
         sendMessage={sendMessage}
       />
       <SearchPlaceComponent setDestination={setDestination} />
-      <button onClick={fetchNearbyUsers}>Find Nearby Users</button>
+      <button className="find-nearby-button" onClick={fetchNearbyUsers}>Find Nearby Users</button>
       {nearbyUsers.length > 0 && (
         <div className="nearby-users">
           <h3>Users near the destination:</h3>

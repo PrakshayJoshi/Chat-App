@@ -2,6 +2,11 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const router = express.Router();
 const User = require('../models/User');
+const userController = require('../controllers/userController');
+
+// Other routes...
+
+router.post('/within-boundary', userController.findUsersWithinBoundary);
 
 router.post('/register', async (req, res) => {
   const { username, email, password, location } = req.body;
@@ -53,8 +58,11 @@ router.patch('/:userId/location', async (req, res) => {
   }
 });
 
+
 router.get('/nearby', async (req, res) => {
   const { latitude, longitude, northeast, southwest } = req.query;
+
+  // console.log('Received request to /nearby with params:', req.query);
 
   if ((!latitude || !longitude) && (!northeast || !southwest)) {
     return res.status(400).json({ success: false, message: 'Missing required query parameters' });
@@ -65,6 +73,8 @@ router.get('/nearby', async (req, res) => {
     if (northeast && southwest) {
       const northeastCoords = JSON.parse(northeast);
       const southwestCoords = JSON.parse(southwest);
+
+      // console.log('Searching users within boundary:', southwestCoords, northeastCoords);
 
       // Use polygon (rectangle) for boundary
       users = await User.find({
@@ -77,6 +87,8 @@ router.get('/nearby', async (req, res) => {
           }
         }
       });
+
+      console.log('Found users:', users);
     }
 
     res.status(200).json({ success: true, users });
@@ -85,5 +97,6 @@ router.get('/nearby', async (req, res) => {
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });
+
 
 module.exports = router;

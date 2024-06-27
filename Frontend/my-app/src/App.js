@@ -4,7 +4,7 @@ import { UserProvider } from './contexts/UserContext';
 import HomePage from './components/HomePage';
 import LoginPage from './components/LoginPage';
 import SignUpPage from './components/SignUpPage';
-import './styles/App.css'; // Updated import path
+import './styles/App.css';
 
 const App = () => {
   return (

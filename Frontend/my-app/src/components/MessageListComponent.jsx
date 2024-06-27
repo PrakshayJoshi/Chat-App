@@ -3,27 +3,14 @@ import '../styles/MessageListComponent.css';
 
 const MessageListComponent = ({ messages, startEditMessage }) => {
   return (
-    <div className="messages-container">
-      {messages.map((msg, index) => (
-        <div key={index} className="message">
-          <p>{msg.text}</p>
-          {msg.location && (
-            <p className="message-location">
-              Location: Latitude {msg.location.latitude}, Longitude {msg.location.longitude}
-            </p>
-          )}
-          {msg.destination && (
-            <p className="message-destination">
-              Destination: Latitude {msg.destination.latitude}, Longitude {msg.destination.longitude}
-            </p>
-          )}
-          <p className="message-createdAt">
-            Created At: {new Date(msg.createdAt).toLocaleString()}
-          </p>
-          <button onClick={() => startEditMessage(msg)}>Edit</button>
-        </div>
+    <ul className="message-list">
+      {messages.map((message) => (
+        <li key={message._id} className="message-item">
+          <p>{message.text}</p>
+          <button onClick={() => startEditMessage(message)}>Edit</button>
+        </li>
       ))}
-    </div>
+    </ul>
   );
 };
 
